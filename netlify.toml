@@ -97,15 +97,19 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# The HTML is never cached but the stylesheets and scripts were held for an
+# hour, so a returning visitor could get new markup with an old script - which
+# is exactly how a newly added required field ends up unvalidated in the
+# browser. These files are small; always revalidating them costs a 304.
 [[headers]]
   for = "/css/*"
   [headers.values]
-    Cache-Control = "public, max-age=3600, must-revalidate"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/js/*"
   [headers.values]
-    Cache-Control = "public, max-age=3600, must-revalidate"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/*.html"

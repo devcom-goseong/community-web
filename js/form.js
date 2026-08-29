@@ -25,7 +25,7 @@
   // arrive impossibly fast, which is most of what automated spam looks like.
   if (stamp) stamp.value = String(Date.now());
 
-  var VALIDATED = ["name", "email", "message", "consent"];
+  var VALIDATED = ["name", "email", "message", "agree", "consent"];
 
   function fieldEl(name) {
     return form.querySelector('[data-field="' + name + '"]');
@@ -69,6 +69,7 @@
       student: (data.get("student") || "").toString(),
       studentId: (data.get("studentId") || "").toString().trim(),
       interests: data.getAll("interests"),
+      agree: data.get("agree") ? "yes" : "",
       message: (data.get("message") || "").toString().trim(),
       consent: data.get("consent") ? "yes" : "",
       website: (data.get("website") || "").toString(),
@@ -80,6 +81,7 @@
     var problems = [];
     if (!payload.name) problems.push("name");
     if (!EMAIL_PATTERN.test(payload.email)) problems.push("email");
+    if (!payload.agree) problems.push("agree");
     if (!payload.consent) problems.push("consent");
     if (payload.intent === "question" && !payload.message) problems.push("message");
     return problems;

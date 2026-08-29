@@ -874,6 +874,56 @@
 }
 
 /* =============================================================================
+   DOCUMENT PAGES — rules, terms, privacy
+   ========================================================================== */
+.doc { max-width: 40rem; }
+
+.doc > * + section { margin-top: var(--space-8); }
+
+.doc h2 {
+  font-size: var(--fs-h3);
+  font-weight: var(--weight-display-bold);
+  margin-bottom: var(--space-4);
+}
+
+.doc p + p,
+.doc ul + p,
+.doc p + ul,
+.doc h2 + p { margin-top: var(--space-4); }
+
+.doc p { color: var(--color-text); }
+
+.doc__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  padding-bottom: var(--space-5);
+  border-bottom: var(--rule);
+  margin-bottom: var(--space-8);
+}
+
+.doc__toc { display: grid; gap: var(--space-3); }
+
+.doc__toc a {
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+
+.doc__toc a:hover { color: var(--color-ink); border-bottom-color: var(--color-border-strong); }
+
+/* Anchored headings should not hide under the sticky header. */
+.doc section { scroll-margin-top: calc(var(--header-h) + var(--space-5)); }
+
+/* --- Policy links in the footer bottom bar -------------------------------- */
+.footer__legal { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+
+.footer__legal a { color: var(--color-on-dark-muted); text-decoration: none; }
+.footer__legal a:hover { color: var(--color-on-dark); text-decoration: underline; }
+
+/* =============================================================================
    404
    ========================================================================== */
 .error-page {

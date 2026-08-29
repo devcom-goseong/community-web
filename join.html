@@ -108,6 +108,16 @@
           Complete beginners and non-technical members are welcome. If you are not sure
           where you fit, write exactly that — it is a normal answer.
         </p>
+
+        <div class="note mt-7">
+          <p class="note__title">Read these before you apply</p>
+          <p class="small muted mt-4">Joining means agreeing to all three. They are short.</p>
+          <ul class="ticks mt-5">
+            <li><a href="rules.html">Community rules</a> — what we expect from each other</li>
+            <li><a href="terms.html">Terms</a> — applying, membership and your work</li>
+            <li><a href="privacy.html">Privacy notice</a> — what happens to what you send</li>
+          </ul>
+        </div>
       </div>
 
       <div class="split__body">
@@ -124,7 +134,7 @@
 
         <form class="form" id="join-form" method="post" action="/api/register" novalidate>
 
-          <!-- 01 — intent ------------------------------------------------ -->
+          <!-- intent -->
           <fieldset class="fieldset">
             <legend class="fieldset__legend">Why are you writing<span class="req">&nbsp;*</span></legend>
             <div class="choices choices--row">
@@ -139,7 +149,7 @@
             </div>
           </fieldset>
 
-          <!-- 02 — about you --------------------------------------------- -->
+          <!-- about you -->
           <fieldset class="fieldset">
             <legend class="fieldset__legend">About you</legend>
 
@@ -180,7 +190,7 @@
             </div>
           </fieldset>
 
-          <!-- 03 — interests --------------------------------------------- -->
+          <!-- interests -->
           <fieldset class="fieldset">
             <legend class="fieldset__legend">What are you interested in <span class="opt">(choose any)</span></legend>
             <div class="choices">
@@ -195,7 +205,7 @@
             </div>
           </fieldset>
 
-          <!-- 04 — message ----------------------------------------------- -->
+          <!-- message -->
           <fieldset class="fieldset">
             <legend class="fieldset__legend">Your message</legend>
             <div class="field" data-field="message">
@@ -211,15 +221,28 @@
             </div>
           </fieldset>
 
-          <!-- 05 — consent ----------------------------------------------- -->
+          <!-- consent -->
           <fieldset class="fieldset">
-            <legend class="fieldset__legend">Consent<span class="req">&nbsp;*</span></legend>
-            <div class="field field--consent" data-field="consent">
+            <legend class="fieldset__legend">Before you send<span class="req">&nbsp;*</span></legend>
+
+            <div class="field field--consent" data-field="agree">
+              <label class="consent">
+                <input type="checkbox" id="agree" name="agree" value="yes" required aria-describedby="agree-error">
+                <span>
+                  I have read the <a href="rules.html">community rules</a>, the
+                  <a href="terms.html">terms</a> and the
+                  <a href="privacy.html">privacy notice</a>, and I agree to them.
+                </span>
+              </label>
+              <p class="field__error" id="agree-error">Please read the three documents and tick to agree.</p>
+            </div>
+
+            <div class="field field--consent mt-5" data-field="consent">
               <label class="consent">
                 <input type="checkbox" id="consent" name="consent" value="yes" required aria-describedby="consent-error">
                 <span>
                   I agree to be contacted by the KDU Developer Community about my message or
-                  application, and I understand my details stay with the founding team.
+                  application, and I understand my details stay with the leadership team.
                 </span>
               </label>
               <p class="field__error" id="consent-error">We need your agreement before we can write back.</p>
@@ -326,6 +349,11 @@
 
     <div class="footer__bottom">
       <p>&copy; <span data-current-year>2026</span> KDU Developer Community</p>
+      <nav class="footer__legal" aria-label="Policies">
+        <a href="rules.html">Community rules</a>
+        <a href="terms.html">Terms</a>
+        <a href="privacy.html">Privacy</a>
+      </nav>
       <p>Built by the founding team</p>
     </div>
   </div>

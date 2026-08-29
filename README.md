@@ -13,9 +13,12 @@ form. Everything else is static files that can be opened straight from disk.
 ```
 .
 ├── index.html                 Home
-├── about.html                 Origin, mission, values, team, membership, rules
+├── about.html                 Origin, mission, values, roles, membership
 ├── activities.html            The seven activities
 ├── join.html                  Join / contact form
+├── rules.html                 Community rules - applicants must accept these
+├── terms.html                 Terms of membership and of using the site
+├── privacy.html               What the form collects and what happens to it
 ├── 404.html                   Not-found page (Netlify serves it automatically)
 │
 ├── css/
@@ -353,6 +356,27 @@ changes the subject line of the notification and what counts as required.
 **Without JavaScript** the form posts normally to the same endpoint and the
 function answers with a small confirmation page that reuses the site
 stylesheets. Nothing is lost.
+
+### What an applicant agrees to
+
+The form has two required checkboxes, and both are checked again on the server -
+the browser check is a convenience, not a control:
+
+- **Agreement.** They confirm they have read `rules.html`, `terms.html` and
+  `privacy.html`. The three are also linked in the panel beside the form, so they
+  are visible before anyone starts filling it in, not just at the point of
+  signing.
+- **Contact consent.** Separate on purpose: agreeing to the rules is not the same
+  as agreeing to be emailed.
+
+Both are recorded. The team notification lists whether each was given, alongside
+the timestamp, so there is a record of what was accepted and when. The applicant's
+confirmation email repeats it and links the three documents, so they have their
+own copy.
+
+If the documents change materially, the date at the top of each page is the
+version members agreed to, and anything significant should be announced on the
+community platform.
 
 ### Spam protection
 

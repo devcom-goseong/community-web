@@ -187,6 +187,8 @@ function notificationEmail(entry) {
     ["Student ID", entry.studentId || "—"],
     ["Interests", entry.interests.length ? entry.interests.join(", ") : "—"],
     ["Reason", entry.intent === "question" ? "Question" : "Membership application"],
+    ["Accepted rules, terms, privacy", entry.agree ? "Yes" : "No"],
+    ["Consented to be contacted", entry.consent ? "Yes" : "No"],
     ["Received", entry.received]
   ];
 
@@ -232,7 +234,8 @@ function confirmationEmail(entry) {
     `Name: ${entry.name}`,
     `Email: ${entry.email}`,
     `KDU student: ${STUDENT_LABELS[entry.student] || "Not answered"}`,
-    entry.interests.length ? `Interests: ${entry.interests.join(", ")}` : null
+    entry.interests.length ? `Interests: ${entry.interests.join(", ")}` : null,
+    `Accepted the community rules, terms and privacy notice on ${entry.received}`
   ]
     .filter(Boolean)
     .join("\n");
@@ -252,8 +255,14 @@ ${entry.message ? `Your message:\n${entry.message}\n\n` : ""}If anything above i
 Kyungdong University, South Korea
 ${SITE_URL}
 
+You can read what you agreed to at any time:
+  Rules:   ${SITE_URL}/rules.html
+  Terms:   ${SITE_URL}/terms.html
+  Privacy: ${SITE_URL}/privacy.html
+
 You are receiving this because you used the form at ${SITE_URL}/join.html. We keep
-your details in our inbox only, and we do not share them outside the founding team.`;
+your details in our inbox only, and we do not share them outside the leadership
+team. Ask us to delete them and we will.`;
 
   const html = `<div style="font-family:Helvetica,Arial,sans-serif;color:#141414;line-height:1.65;max-width:600px">
   <p style="font-family:monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#6a6a6a;margin:0 0 8px">
@@ -280,8 +289,12 @@ your details in our inbox only, and we do not share them outside the founding te
   <p style="margin:24px 0 0">If anything above is wrong, just reply to this email and tell us.</p>
   <p style="margin:24px 0 0;color:#6a6a6a">— The ${escapeHtml(TEAM_NAME)} founding team<br>Kyungdong University, South Korea</p>
   <p style="font-size:12px;color:#8a8a8a;margin-top:28px;border-top:1px solid #d4d4d4;padding-top:12px">
+    You agreed to the <a href="${SITE_URL}/rules.html">community rules</a>,
+    <a href="${SITE_URL}/terms.html">terms</a> and
+    <a href="${SITE_URL}/privacy.html">privacy notice</a> on ${entry.received}.
     You are receiving this because you used the form at ${SITE_URL}/join.html.
-    Your details stay in our inbox and are not shared outside the founding team.
+    Your details stay in our inbox, are not shared outside the leadership team,
+    and are deleted whenever you ask.
   </p>
 </div>`;
 
@@ -345,12 +358,14 @@ exports.handler = async function handler(event) {
       .filter(Boolean),
     message: clean(data.message, LIMITS.message),
     consent: data.consent === "yes" || data.consent === true || data.consent === "on",
+    agree: data.agree === "yes" || data.agree === true || data.agree === "on",
     received: new Date().toISOString().replace("T", " ").slice(0, 16) + " UTC"
   };
 
   const fields = [];
   if (!entry.name) fields.push("name");
   if (!EMAIL_PATTERN.test(entry.email)) fields.push("email");
+  if (!entry.agree) fields.push("agree");
   if (!entry.consent) fields.push("consent");
   if (entry.intent === "question" && !entry.message) fields.push("message");
 
