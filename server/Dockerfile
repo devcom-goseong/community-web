@@ -7,7 +7,7 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1
 
 WORKDIR /wheels
-COPY requirements.txt .
+COPY server/requirements.txt .
 RUN pip wheel --wheel-dir /wheels -r requirements.txt
 
 
@@ -30,10 +30,17 @@ RUN useradd --create-home --uid 10001 app
 WORKDIR /app
 
 COPY --from=build /wheels /wheels
-COPY requirements.txt .
+COPY server/requirements.txt .
 RUN pip install --no-index --find-links=/wheels -r requirements.txt && rm -rf /wheels
 
-COPY --chown=app:app . .
+# The build context is the repository root, so the front-end folders the site
+# shares with the static Netlify build come in alongside the Django app.
+COPY --chown=app:app server/ /app/server/
+COPY --chown=app:app css/ /app/css/
+COPY --chown=app:app js/ /app/js/
+COPY --chown=app:app assets/ /app/assets/
+
+WORKDIR /app/server
 
 # Collected at build time so the image is self-contained and the container
 # starts without touching a volume. A dummy key is used because collectstatic

@@ -1,10 +1,13 @@
 """
-Django settings for the KDU Developer Community applications service.
+Django settings for the KDU Developer Community site.
 
-This service does not serve the public website. The public site stays on
-Netlify as static files; this app exists to receive the join / contact form,
-store each application so the leadership team can review it in one place, and
-send the two emails the visitor and the team expect.
+The app does two things: it renders the public pages from content held in the
+database and editable in the admin, and it receives the join / contact form,
+storing each application and sending the two emails.
+
+The static Netlify build is still the live site. This runs alongside it until
+the team decides to switch over. Both read the same stylesheets, scripts and
+images from the repository root, so there is one copy of the design.
 
 Everything environment-specific comes from environment variables. Nothing
 secret is committed. See .env.example.
@@ -59,6 +62,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "content",
     "applications",
 ]
 
@@ -129,6 +133,16 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# The stylesheets, scripts and images are shared with the static Netlify site
+# and live at the repository root. They are referenced from there rather than
+# copied, so there is one copy of the design and not two that drift apart.
+FRONTEND_DIR = BASE_DIR.parent
+STATICFILES_DIRS = [
+    (prefix, FRONTEND_DIR / prefix)
+    for prefix in ("css", "js", "assets")
+    if (FRONTEND_DIR / prefix).is_dir()
+]
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
@@ -169,6 +183,10 @@ TEAM_INBOX = env("TEAM_INBOX", "") or EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = f"{TEAM_NAME} <{EMAIL_HOST_USER}>" if EMAIL_HOST_USER else "webmaster@localhost"
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 PUBLIC_SITE_URL = env("PUBLIC_SITE_URL", "https://dev-comm.netlify.app")
+
+# Where the join form posts. Same-origin here, so the front-end script needs no
+# change whether the pages are served by Django or by the static site.
+FORM_ENDPOINT = env("FORM_ENDPOINT", "/api/register")
 
 # --- Form protection ------------------------------------------------------
 MIN_FILL_SECONDS = float(env("MIN_FILL_SECONDS", "1.5"))

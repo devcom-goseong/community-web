@@ -7,6 +7,9 @@ on:
     branches: [main]
     paths:
       - "server/**"
+      - "css/**"
+      - "js/**"
+      - "assets/**"
       - ".github/workflows/applications.yml"
   pull_request:
     paths:
@@ -110,7 +113,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./server
+          # The repository root, because the image also needs the shared
+          # css/, js/ and assets/ folders that the static site uses.
+          context: .
+          file: ./server/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

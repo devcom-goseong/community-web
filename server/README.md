@@ -1,19 +1,47 @@
-# Applications service
+# The Django site
 
-A small Django app that receives the join / contact form, stores each
-submission so the leadership team can review them in one place, and sends the
-two emails the applicant and the team expect.
+A Django app that does two things:
 
-**It does not serve the public website.** That stays on Netlify as static
-files, exactly as it is. This service only owns the form.
+1. **Renders every public page from the database**, so the copy is editable in
+   the admin by people who will never open the CSS.
+2. **Receives the join / contact form**, stores each application so the
+   leadership team can review them in one place, and sends the two emails.
+
+**It is not live yet.** The static Netlify build is still the site visitors
+see. This runs alongside it until the team decides to switch over.
 
 ```
-Netlify (dev-comm.netlify.app)          this service (your VPS)
-  22 static pages, unchanged     ──▶    POST /api/register
-  js/form.js posts the form             stores the application
-                                        sends both emails
-                                        /admin/ to review them
+Netlify (dev-comm.netlify.app)     this app (your VPS)
+  the live site, unchanged           the same pages, from the database
+                                     /admin/ to edit every word of them
+                                     /admin/ to review applications
+                                     POST /api/register
 ```
+
+Both read the same `css/`, `js/` and `assets/` from the repository root, so
+there is one copy of the design and not two that drift apart.
+
+## What is editable in the admin
+
+| Screen | What it controls |
+| --- | --- |
+| Site settings | Community name, university, footer text, and the Discord / WhatsApp / Instagram / GitHub links. Leave a link blank and the site shows a "Soon" tag; fill it in and it becomes a real link on every page at once |
+| Pages | The rules, terms, privacy notice, first month, accessibility and contributing pages — each with its own sections, which also build the contents list in the margin |
+| Activities | All seven, with their cadence tags, index copy and the sections on their own pages |
+| Home page cards and facts | The four cards and the at-a-glance strip |
+| Values | What the community holds members to |
+| Areas of responsibility | How the work is divided, described without naming anyone |
+| Joining steps | The four steps on the About page |
+| Questions | The FAQ |
+| Interest areas | Both the explanations *and* the tick boxes on the application form |
+| Resources | Grouped links, each with a note |
+
+Everything has a **published** tick and an **order** number, so any of it can be
+hidden or reordered without a deploy.
+
+Run `python manage.py seed_content` once to load the site's current copy into
+the database. It is idempotent, but it overwrites the rows it manages — so run
+it at setup, and edit in the admin after that.
 
 ---
 
@@ -80,12 +108,18 @@ ruff check .
 python manage.py check --deploy --fail-level WARNING
 ```
 
-Sixteen tests cover the endpoint: validation, the required agreement, the
+Twenty-seven tests. Sixteen cover the form endpoint: validation, the required agreement, the
 honeypot, the timing trap, rate limiting, CR/LF stripping from mail headers,
 HTML escaping, the no-JavaScript path, and that an application survives an
 email outage. One test asserts the submitter's IP is never written to the
 database, because the privacy notice says so and a promise in prose is worth
 less than a test.
+
+The other eleven cover the content: every page renders from the database, every
+activity has a page, unpublishing something removes it from the site *and*
+returns a 404, editing a section changes the rendered page, filling in a
+platform URL turns the "Soon" tag into a link, and re-running the seed does not
+duplicate anything.
 
 ---
 
