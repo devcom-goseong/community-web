@@ -69,14 +69,6 @@
   status = 404
   force = true
 
-# The Django applications service lives in the repository but is deployed
-# separately, to its own server. Netlify must never serve its source.
-[[redirects]]
-  from = "/server/*"
-  to = "/404.html"
-  status = 404
-  force = true
-
 # Netlify already serves /about for about.html, so clean URLs work without any
 # extra rules. Internal links and the canonical tags both use the .html form so
 # there is exactly one canonical address per page.

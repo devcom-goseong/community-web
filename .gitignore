@@ -6,13 +6,6 @@
 # Dependencies
 node_modules/
 
-# Django service
-server/db.sqlite3
-server/staticfiles/
-__pycache__/
-*.py[cod]
-.ruff_cache/
-.venv/
 
 # Netlify
 .netlify/

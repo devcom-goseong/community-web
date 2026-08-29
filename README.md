@@ -49,9 +49,7 @@ form. Everything else is static files that can be opened straight from disk.
 │
 ├── netlify/functions/
 │   └── register.js            Receives the form, sends the two emails
-│
-├── server/                    Django applications service - deployed separately,
-│                              not part of the Netlify site. See server/README.md
+
 │
 ├── scripts/
 │   └── check-smtp.js          `npm run check:smtp` - proves the Gmail login works
@@ -476,21 +474,19 @@ as much as a website, and Netlify can minify on the fly if it is ever needed
 
 ---
 
-## 9. The applications service
+## 9. The Django version
 
-`server/` holds a Django app that can take over the form: it stores every
-submission in a database so the leadership team can review applications in one
-place instead of digging through an inbox, and still sends the same two emails.
-It runs on its own server with Docker, Postgres and nginx, and has its own CI
-pipeline in `.github/workflows/applications.yml`.
+There is a separate Django project that renders these pages from a database
+and gives the leadership team an admin to edit them and to review applications.
+It lives in its own repository, deploys to its own server, and has nothing to
+do with this one.
 
-**It is not live, and the public site is unchanged.** Nothing in this README
-applies to it; `server/README.md` covers running, testing and deploying it.
+**This repository is the live site.** Nothing here depends on that project, and
+this site keeps working whether or not it is ever switched on.
 
-One thing to carry across if it is ever switched on: the privacy notice on this
-site says there is no database. That statement has to be rewritten in the same
-commit that points the form at the Django service. `server/README.md` opens
-with the replacement wording.
+If it is switched on one day, one thing has to move with it: the privacy notice
+on this site says there is no database. That sentence has to be rewritten in the
+same change that points the form at Django.
 
 ---
 
