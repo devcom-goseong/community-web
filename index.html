@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>KDU Developer Community — Students building things together at Kyungdong University</title>
+<meta name="description" content="A student-run developer community at Kyungdong University, South Korea. Weekly meetings, study groups, projects, hackathons and demo days — open to every skill level, technical or not.">
+<link rel="canonical" href="https://dev-comm.netlify.app/index.html">
+
+<!-- Open Graph / Twitter. Replace the domain in every page if the site
+     is deployed somewhere other than dev-comm.netlify.app -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KDU Developer Community">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="KDU Developer Community">
+<meta property="og:description" content="A student-run developer community at Kyungdong University, South Korea. Learn together, build real projects, meet people who are working on the same things.">
+<meta property="og:url" content="https://dev-comm.netlify.app/index.html">
+<meta property="og:image" content="https://dev-comm.netlify.app/assets/images/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The KDU Developer Community mark: an ink-drawn hand reaching up out of a solid black band.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="KDU Developer Community">
+<meta name="twitter:description" content="A student-run developer community at Kyungdong University, South Korea.">
+<meta name="twitter:image" content="https://dev-comm.netlify.app/assets/images/og-image.png">
+
+<link rel="icon" href="assets/favicon/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#0d0d0d">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..600&amp;display=swap">
+
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<script src="js/site.js" defer></script>
+</head>
+
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap wrap--wide site-header__inner">
+    <a class="brand" href="index.html" aria-label="KDU Developer Community — home">
+      <img class="brand__mark" src="assets/images/logo-mark.png" width="320" height="38" alt="" aria-hidden="true">
+      <span class="brand__text"><span>KDU Developer</span><span>Community</span></span>
+    </a>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span>Menu</span>
+      <span class="nav-toggle__bars" aria-hidden="true"></span>
+    </button>
+
+    <nav class="site-nav" id="site-nav" data-open="false" aria-label="Primary">
+      <ul class="nav__list">
+        <li><a class="nav__link" href="about.html">About</a></li>
+        <li><a class="nav__link" href="activities.html">Activities</a></li>
+        <li><a class="nav__link nav__link--cta" href="join.html">Join</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===================================================================
+       HERO
+       =================================================================== -->
+  <section class="hero">
+    <div class="wrap wrap--wide hero__inner">
+      <p class="hero__eyebrow caption">Kyungdong University &middot; South Korea &middot; Founded 2026</p>
+
+      <h1 class="hero__title">KDU Developer Community</h1>
+
+      <p class="hero__lead">
+        A student community for people who want to learn, build and finish things
+        together — programmers, designers, AI and data people, writers and organisers.
+      </p>
+
+      <div class="hero__actions">
+        <a class="btn" href="join.html">Join the community</a>
+        <a class="btn btn--ghost" href="about.html">What we are building</a>
+      </div>
+    </div>
+
+    <picture>
+      <source srcset="assets/images/hand.webp" type="image/webp">
+      <img class="hero__hand" src="assets/images/hand.png" width="894" height="1200"
+           alt="" aria-hidden="true" fetchpriority="high" decoding="async">
+    </picture>
+
+    <div class="hero__ground"></div>
+  </section>
+
+  <!-- ===================================================================
+       FACTS
+       =================================================================== -->
+  <section class="section section--tight" aria-label="At a glance">
+    <div class="wrap">
+      <dl class="facts">
+        <div><dt>Founded</dt><dd>August 2026</dd></div>
+        <div><dt>Based at</dt><dd>Kyungdong University</dd></div>
+        <div><dt>Open to</dt><dd>Every skill level</dd></div>
+        <div><dt>We meet</dt><dd>Weekly &amp; monthly</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       01 — MISSION
+       =================================================================== -->
+  <section class="section section--flush-top" aria-labelledby="mission-title">
+    <div class="wrap split">
+      <div class="split__aside">
+        <div class="plate">
+          <h2 class="plate__title" id="mission-title">Why this community exists</h2>
+        </div>
+      </div>
+
+      <div class="split__body">
+        <blockquote class="pull pull--wide">
+          &ldquo;We want the community to stay organised, rather than become a large
+          group where nobody knows what is happening.&rdquo;
+          <cite>Founding meeting &middot; 26 August 2026</cite>
+        </blockquote>
+
+        <div class="prose mt-8">
+          <p>
+            Plenty of students at KDU are teaching themselves to code, sketching product
+            ideas, or quietly working on something interesting on their own. What was
+            missing was an obvious place to find each other. This is that place.
+          </p>
+          <p>
+            The community is run by students, for students. A founding team is putting the
+            rules, the platforms and the first activities in place so that anyone who joins
+            knows what the community is, what to expect from it, what is expected from
+            them, and who to ask when they need help.
+          </p>
+          <p>
+            We would rather be small and useful than large and noisy. Activities start at a
+            size we can genuinely run, and grow as more people step forward to take
+            responsibility for them.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       02 — WHAT WE DO FOR EACH OTHER
+       =================================================================== -->
+  <section class="section section--flush-top" aria-labelledby="offer-title">
+    <div class="wrap">
+      <div class="plate">
+        <h2 class="plate__title plate__title--wide" id="offer-title">Four things we do for each other</h2>
+      </div>
+
+      <div class="grid grid--4 mt-8">
+        <article class="card">
+          <svg class="card__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3 5h6a3 3 0 0 1 3 3v12a2.5 2.5 0 0 0-2.5-2.5H3z"/>
+            <path d="M21 5h-6a3 3 0 0 0-3 3v12a2.5 2.5 0 0 1 2.5-2.5H21z"/>
+          </svg>
+          <h3 class="card__title">Learn together</h3>
+          <p class="card__text">
+            A weekly meeting with one topic, plus member-run study groups for
+            programming, data science, web, mobile and certification prep. Asking a
+            basic question is normal here.
+          </p>
+        </article>
+
+        <article class="card">
+          <svg class="card__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M8 6.5 3 12l5 5.5"/>
+            <path d="M16 6.5 21 12l-5 5.5"/>
+            <path d="M13.6 4.2 10.4 19.8"/>
+          </svg>
+          <h3 class="card__title">Build real things</h3>
+          <p class="card__text">
+            Submit an idea, find people whose skills complete yours, and ship something
+            that exists outside a tutorial. Teams need designers and writers as much as
+            they need engineers.
+          </p>
+        </article>
+
+        <article class="card">
+          <svg class="card__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="5.5" cy="7" r="2.5"/>
+            <circle cx="18.5" cy="7" r="2.5"/>
+            <circle cx="12" cy="18" r="2.5"/>
+            <path d="M8 7h8M7.2 9.2l3.4 6.6M16.8 9.2l-3.4 6.6"/>
+          </svg>
+          <h3 class="card__title">Meet people</h3>
+          <p class="card__text">
+            One in-person meetup every month for workshops, hands-on sessions and
+            plain conversation, alongside guest speakers invited into the weekly
+            discussion.
+          </p>
+        </article>
+
+        <article class="card">
+          <svg class="card__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect x="2.5" y="4" width="19" height="13"/>
+            <path d="M9 21h6M12 17v4"/>
+            <path d="M7 13.5l3-3.5 2.5 2.5L17 8"/>
+          </svg>
+          <h3 class="card__title">Show your work</h3>
+          <p class="card__text">
+            Demo days give you a room, an audience and honest feedback — practice at
+            presenting, a portfolio piece, and often a collaborator you did not know
+            you needed.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       03 — THE RHYTHM
+       =================================================================== -->
+  <section class="section section--flush-top" aria-labelledby="rhythm-title">
+    <div class="wrap split">
+      <div class="split__aside">
+        <div class="plate">
+          <h2 class="plate__title" id="rhythm-title">What a term looks like</h2>
+          <p class="plate__note small">
+            Not everything starts at once. We begin with the weekly meeting and the study
+            groups, and add the rest as the community can carry them.
+          </p>
+          <p class="mt-6">
+            <a class="link-arrow" href="activities.html">All activities</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="split__body">
+        <ul class="roster">
+          <li><span class="roster__name">Community meeting</span><span class="roster__meta">Weekly</span></li>
+          <li><span class="roster__name">Study groups</span><span class="roster__meta">Weekly &middot; member-run</span></li>
+          <li><span class="roster__name">Idea submissions</span><span class="roster__meta">Always open</span></li>
+          <li><span class="roster__name">Project teams</span><span class="roster__meta">Ongoing</span></li>
+          <li><span class="roster__name">In-person meetup</span><span class="roster__meta">Monthly</span></li>
+          <li><span class="roster__name">Hackathons</span><span class="roster__meta">When they come up</span></li>
+          <li><span class="roster__name">Demo day</span><span class="roster__meta">Once a term</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       04 — WHO IT IS FOR
+       =================================================================== -->
+  <section class="section section--flush-top" aria-labelledby="who-title">
+    <div class="wrap split">
+      <div class="split__aside">
+        <div class="plate">
+          <h2 class="plate__title" id="who-title">Not only for programmers</h2>
+        </div>
+      </div>
+
+      <div class="split__body">
+        <p class="lead">
+          One project usually needs five different kinds of person. If only one of them
+          shows up, the project does not get made.
+        </p>
+
+        <ul class="ticks ticks--cols mt-7">
+          <li>Someone who writes the code</li>
+          <li>Someone who designs how it looks and behaves</li>
+          <li>Someone who understands AI or data</li>
+          <li>Someone who keeps the documentation honest</li>
+          <li>Someone who handles outreach and the business side</li>
+          <li>Someone who keeps everyone organised</li>
+        </ul>
+
+        <p class="muted measure mt-7">
+          Complete beginners are welcome, and so are people with no technical background
+          at all. If you are not sure where you fit, say exactly that on the form — it is
+          a normal answer, and we will help you find a starting point.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       CALL TO ACTION
+       =================================================================== -->
+  <section class="band" aria-labelledby="cta-title">
+    <div class="wrap band__inner">
+      <div>
+        <img class="band__mark" src="assets/images/logo-mark-inverse.png" width="320" height="38" alt="" aria-hidden="true">
+        <h2 class="band__title" id="cta-title">Come and build <span class="is-em">something</span> with us.</h2>
+        <p class="band__text">
+          Tell us who you are and what you are interested in. We read every message, and
+          you will hear back from a person on the founding team — not an autoresponder.
+        </p>
+      </div>
+      <div>
+        <a class="btn btn--on-dark" href="join.html">Join the community</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap wrap--wide">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a class="brand" href="index.html">
+          <img class="brand__mark" src="assets/images/logo-mark-inverse.png" width="320" height="38" alt="" aria-hidden="true">
+          <span class="brand__text"><span>KDU Developer</span><span>Community</span></span>
+        </a>
+        <p class="footer__blurb">
+          A student-run developer community at Kyungdong University, South Korea.
+          Learning together, building together, and keeping it organised enough to last.
+        </p>
+      </div>
+
+      <nav aria-labelledby="footer-explore">
+        <p class="footer__heading" id="footer-explore">Explore</p>
+        <ul class="footer__list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="activities.html">Activities</a></li>
+          <li><a href="join.html">Join or contact</a></li>
+        </ul>
+      </nav>
+
+      <div>
+        <p class="footer__heading">Platforms</p>
+        <!-- Once each invite link exists, replace the <span> with
+             <a href="URL">Discord</a> and delete its "Soon" tag. -->
+        <ul class="footer__list">
+          <li><span>Discord</span> <span class="footer__soon">Soon</span></li>
+          <li><span>WhatsApp</span> <span class="footer__soon">Soon</span></li>
+          <li><span>Instagram</span> <span class="footer__soon">Soon</span></li>
+          <li><a href="https://github.com/devcom-goseong">GitHub</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="footer__heading">Get in touch</p>
+        <ul class="footer__list">
+          <li><a href="join.html">Send us a message</a></li>
+          <li><a href="join.html">Apply to join</a></li>
+          <li class="on-dark-faint">Kyungdong University<br>South Korea</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>&copy; <span data-current-year>2026</span> KDU Developer Community</p>
+      <p>Built by the founding team</p>
+    </div>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "KDU Developer Community",
+  "alternateName": "KDU Dev Community",
+  "url": "https://dev-comm.netlify.app/",
+  "logo": "https://dev-comm.netlify.app/assets/images/logo-full.png",
+  "image": "https://dev-comm.netlify.app/assets/images/og-image.png",
+  "description": "A student-run developer community at Kyungdong University, South Korea. Weekly meetings, study groups, projects, hackathons and demo days, open to every skill level.",
+  "foundingDate": "2026-08",
+  "areaServed": "KR",
+  "parentOrganization": {
+    "@type": "CollegeOrUniversity",
+    "name": "Kyungdong University"
+  },
+  "location": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "KR"
+    }
+  }
+}
+</script>
+
+</body>
+</html>

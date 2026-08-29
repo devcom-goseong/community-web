@@ -1,0 +1,25 @@
+# Secrets - never commit these
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Netlify
+.netlify/
+
+# Generated page renders - regenerate them, do not track them
+design/preview/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and crash dumps
+*.log
+*.stackdump
+npm-debug.log*

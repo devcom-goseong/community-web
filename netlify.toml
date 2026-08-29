@@ -1,0 +1,113 @@
+# =============================================================================
+# KDU Developer Community — Netlify configuration
+# =============================================================================
+
+[build]
+  # The site is plain HTML/CSS/JS: nothing to compile, publish the repo root.
+  publish = "."
+  functions = "netlify/functions"
+  command = "echo 'Static site — no build step.'"
+
+[functions]
+  node_bundler = "esbuild"
+
+[dev]
+  # `netlify dev` serves the static files and the function together on :8888
+  framework = "#static"
+  publish = "."
+  port = 8888
+
+# -----------------------------------------------------------------------------
+# Routing
+# -----------------------------------------------------------------------------
+
+# A friendlier endpoint for the join / contact form.
+[[redirects]]
+  from = "/api/register"
+  to = "/.netlify/functions/register"
+  status = 200
+  force = true
+
+# Reports whether the email variables are reaching the functions. Presence
+# only - it never reads or returns a value. Safe to remove once the form is
+# confirmed working; delete this block and netlify/functions/health.js.
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+  force = true
+
+# Project files that live in the publish directory but must never be served.
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/netlify.toml"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/package.json"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/package-lock.json"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/README.md"
+  to = "/404.html"
+  status = 404
+
+# Master artwork and the script that generates the assets. Useful in the repo,
+# not something to serve.
+[[redirects]]
+  from = "/design/*"
+  to = "/404.html"
+  status = 404
+
+# Netlify already serves /about for about.html, so clean URLs work without any
+# extra rules. Internal links and the canonical tags both use the .html form so
+# there is exactly one canonical address per page.
+
+# -----------------------------------------------------------------------------
+# Headers
+# -----------------------------------------------------------------------------
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+    # 'unsafe-inline' for scripts covers the JSON-LD block on the home page, and
+    # for styles the small amount of inline styling in the emailed fallback page.
+    # Everything else is locked to this origin plus Google Fonts.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+
+# Images and icons are content-addressed by name and change rarely.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

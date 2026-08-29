@@ -1,0 +1,24 @@
+{
+  "name": "kdu-developer-community",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static website for the KDU Developer Community, Kyungdong University, South Korea.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devcom-goseong/community-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/devcom-goseong/community-web/issues"
+  },
+  "scripts": {
+    "dev": "netlify dev",
+    "serve": "npx --yes serve . --listen 3000",
+    "check:smtp": "node scripts/check-smtp.js"
+  },
+  "dependencies": {
+    "nodemailer": "^9.0.6"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

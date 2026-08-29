@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# The form endpoint is not a page.
+Disallow: /api/
+Disallow: /.netlify/
+
+Sitemap: https://dev-comm.netlify.app/sitemap.xml
