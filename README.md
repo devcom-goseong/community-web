@@ -50,6 +50,9 @@ form. Everything else is static files that can be opened straight from disk.
 ├── netlify/functions/
 │   └── register.js            Receives the form, sends the two emails
 │
+├── server/                    Django applications service - deployed separately,
+│                              not part of the Netlify site. See server/README.md
+│
 ├── scripts/
 │   └── check-smtp.js          `npm run check:smtp` - proves the Gmail login works
 │
@@ -473,7 +476,25 @@ as much as a website, and Netlify can minify on the fly if it is ever needed
 
 ---
 
-## 9. Credits
+## 9. The applications service
+
+`server/` holds a Django app that can take over the form: it stores every
+submission in a database so the leadership team can review applications in one
+place instead of digging through an inbox, and still sends the same two emails.
+It runs on its own server with Docker, Postgres and nginx, and has its own CI
+pipeline in `.github/workflows/applications.yml`.
+
+**It is not live, and the public site is unchanged.** Nothing in this README
+applies to it; `server/README.md` covers running, testing and deploying it.
+
+One thing to carry across if it is ever switched on: the privacy notice on this
+site says there is no database. That statement has to be rewritten in the same
+commit that points the form at the Django service. `server/README.md` opens
+with the replacement wording.
+
+---
+
+## 10. Credits
 
 Built by the founding team of the KDU Developer Community. The site describes
 the community's work by area of responsibility rather than by person, and the
