@@ -107,6 +107,24 @@ function rateLimited(ip) {
   return hits.length > RATE_MAX;
 }
 
+/* Netlify stops a synchronous function at 10 seconds. Nodemailer's own
+   timeouts do not always fire before that, and when the function is killed
+   instead the caller gets a 502 with an HTML body - which the form cannot
+   parse, so the visitor sees a generic "something went wrong" with no
+   explanation. Bounding each send keeps every failure inside our own error
+   handling, where it has a message attached. */
+const SEND_BUDGET_MS = 7000;
+
+function withTimeout(promise, ms, label) {
+  let timer;
+  const limit = new Promise(function (_, reject) {
+    timer = setTimeout(function () {
+      reject(new Error(label + " did not finish within " + ms + "ms"));
+    }, ms);
+  });
+  return Promise.race([promise, limit]).finally(function () { clearTimeout(timer); });
+}
+
 /* -----------------------------------------------------------------------------
    Responses
    -------------------------------------------------------------------------- */
@@ -407,12 +425,31 @@ exports.handler = async function handler(event) {
     );
   }
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port,
-    secure: port === 465,
-    auth: { user, pass }
-  });
+  let transporter;
+  try {
+    transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+      // One pooled connection carries both messages, so Gmail is greeted and
+      // authenticated once rather than twice. On a cold start the second
+      // handshake was the difference between finishing and being killed.
+      pool: true,
+      maxConnections: 1,
+      maxMessages: 3,
+      connectionTimeout: 5000,
+      greetingTimeout: 4000,
+      socketTimeout: 6000
+    });
+  } catch (error) {
+    console.error("register: could not create the mail transport:", error && error.message);
+    return fail(
+      wantsJson,
+      500,
+      "The site cannot send email at the moment. Please try again later \u2014 we have been notified."
+    );
+  }
 
   const from = `"${TEAM_NAME}" <${user}>`;
   const subjectName = entry.name || entry.email;
@@ -421,21 +458,52 @@ exports.handler = async function handler(event) {
 
   /* --- Send -------------------------------------------------------------- */
 
+  // Both messages are queued at once so they share the pooled connection. The
+  // team notification is the one that must not be lost; the applicant's
+  // confirmation is best effort, because by the time it fails the team already
+  // has the submission and telling the applicant it failed would be wrong.
+  const [teamSend, applicantSend] = await Promise.allSettled([
+    withTimeout(
+      transporter.sendMail({
+        from,
+        to: inbox,
+        replyTo: `"${subjectName}" <${entry.email}>`,
+        subject:
+          entry.intent === "question"
+            ? `[KDU Dev] Question from ${subjectName}`
+            : `[KDU Dev] Membership application \u2014 ${subjectName}`,
+        text: notification.text,
+        html: notification.html
+      }),
+      SEND_BUDGET_MS,
+      "team notification"
+    ),
+    withTimeout(
+      transporter.sendMail({
+        from,
+        to: `"${subjectName}" <${entry.email}>`,
+        replyTo: inbox,
+        subject: `Thanks for your interest in the ${TEAM_NAME}`,
+        text: confirmation.text,
+        html: confirmation.html
+      }),
+      SEND_BUDGET_MS,
+      "confirmation"
+    )
+  ]);
+
+  // Release the pooled connection so the function can exit promptly.
   try {
-    // The team notification is the one that must not be lost, so it goes first.
-    await transporter.sendMail({
-      from,
-      to: inbox,
-      replyTo: `"${subjectName}" <${entry.email}>`,
-      subject:
-        entry.intent === "question"
-          ? `[KDU Dev] Question from ${subjectName}`
-          : `[KDU Dev] Membership application — ${subjectName}`,
-      text: notification.text,
-      html: notification.html
-    });
+    if (transporter && typeof transporter.close === "function") transporter.close();
   } catch (error) {
-    console.error("register: could not send the team notification:", error && error.message);
+    /* closing a pool that never opened is not a failure */
+  }
+
+  if (teamSend.status === "rejected") {
+    console.error(
+      "register: could not send the team notification:",
+      teamSend.reason && teamSend.reason.message
+    );
     return fail(
       wantsJson,
       502,
@@ -443,19 +511,11 @@ exports.handler = async function handler(event) {
     );
   }
 
-  try {
-    await transporter.sendMail({
-      from,
-      to: `"${subjectName}" <${entry.email}>`,
-      replyTo: inbox,
-      subject: `Thanks for your interest in the ${TEAM_NAME}`,
-      text: confirmation.text,
-      html: confirmation.html
-    });
-  } catch (error) {
-    // The team already has the submission, so this is not a failure for the
-    // person who wrote in. Log it and still report success.
-    console.error("register: could not send the applicant confirmation:", error && error.message);
+  if (applicantSend.status === "rejected") {
+    console.error(
+      "register: the team was notified but the applicant confirmation failed:",
+      applicantSend.reason && applicantSend.reason.message
+    );
   }
 
   return succeed(wantsJson, entry.email);
