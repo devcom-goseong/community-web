@@ -14,11 +14,27 @@ form. Everything else is static files that can be opened straight from disk.
 .
 ├── index.html                 Home
 ├── about.html                 Origin, mission, values, roles, membership
-├── activities.html            The seven activities
+├── activities.html            The seven activities, each linking to its own page
 ├── join.html                  Join / contact form
+│
+├── activity-meeting.html      ├── activity-study-groups.html  |
+├── activity-ideas.html         |
+├── activity-projects.html      >  one page per activity
+├── activity-hackathons.html    |
+├── activity-demo-day.html      |
+├── activity-meetups.html      /
+│
+├── start.html                 Your first month, for new members
+├── interests.html             The areas people work across
+├── resources.html             A short list of good starting points
+├── faq.html                   Questions people actually ask
+│
 ├── rules.html                 Community rules - applicants must accept these
 ├── terms.html                 Terms of membership and of using the site
 ├── privacy.html               What the form collects and what happens to it
+├── accessibility.html         What the site does, and what it does not do yet
+├── contribute.html            How to work on this site
+├── contents.html              Human-readable index of every page
 ├── 404.html                   Not-found page (Netlify serves it automatically)
 │
 ├── css/
@@ -48,8 +64,15 @@ form. Everything else is static files that can be opened straight from disk.
 └── .env.example               The environment variables you need to set
 ```
 
-There is no `/pages` directory: the four pages sit at the root so that links
-work identically from disk, from any static server and from Netlify.
+There is no `/pages` directory: all 22 pages sit at the root so links work
+identically from disk, from any static server and from Netlify.
+
+**Adding a page.** There is no template engine, so the head, header and footer
+are duplicated in each file. Copy the nearest existing page, change the
+`<title>`, the meta description, the canonical URL and the `og:`/`twitter:`
+tags, then add it to `sitemap.xml`, to `contents.html`, and to the footer if it
+belongs there. The scripts that generated the current pages are not kept in the
+repository, because a generator nobody runs is worse than honest duplication.
 
 ---
 

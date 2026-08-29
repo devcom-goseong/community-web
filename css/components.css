@@ -880,6 +880,9 @@
 
 .doc > * + section { margin-top: var(--space-8); }
 
+/* Headings used directly in a document, without a wrapping <section>. */
+.doc > * + h2 { margin-top: var(--space-8); }
+
 .doc h2 {
   font-size: var(--fs-h3);
   font-weight: var(--weight-display-bold);
