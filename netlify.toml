@@ -28,15 +28,6 @@
   status = 200
   force = true
 
-# Reports whether the email variables are reaching the functions. Presence
-# only - it never reads or returns a value. Safe to remove once the form is
-# confirmed working; delete this block and netlify/functions/health.js.
-[[redirects]]
-  from = "/api/health"
-  to = "/.netlify/functions/health"
-  status = 200
-  force = true
-
 # Project files that live in the publish directory but must never be served.
 [[redirects]]
   from = "/netlify/*"
