@@ -14,6 +14,7 @@ secret is committed. See .env.example.
 """
 
 import os
+import sys
 from pathlib import Path
 
 import dj_database_url
@@ -147,6 +148,13 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
+
+# The manifest storage refuses to build a URL for a file collectstatic has not
+# hashed yet, which makes every template test depend on having run
+# collectstatic first. Tests use the plain storage instead; CI still runs
+# collectstatic as its own step, so the manifest path is verified separately.
+if "test" in sys.argv:
+    STORAGES["staticfiles"]["BACKEND"] = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

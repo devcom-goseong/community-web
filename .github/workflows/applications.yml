@@ -77,6 +77,12 @@ jobs:
       - name: Confirm no model change is missing a migration
         run: python manage.py makemigrations --check --dry-run
 
+      # Proves the static pipeline works, which the tests deliberately do not
+      # depend on. A missing or unreadable asset fails here rather than at
+      # image build time.
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput
+
       - name: Test
         run: python manage.py test --verbosity 2
 
