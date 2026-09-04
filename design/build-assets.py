@@ -6,147 +6,164 @@ Rebuild every image asset from the master artwork.
 
 Needs Pillow:  pip install Pillow
 
-The master (design/logo-master.png) is 6000x6000 black ink on white. This script
-cuts it into the pieces the site uses, converts white to transparency so each
-piece sits on any background, and writes PNG + WebP pairs plus the favicons and
-the Open Graph card. Everything it writes is greyscale.
+There are three masters:
 
-If the logo is ever redrawn, update the REGIONS below to match the new artwork
-and run this again. Nothing else in the project needs to change: the filenames
-and pixel sizes stay the same.
+  design/logo-colour.jpeg   the circular mark - dots, </> and the hand
+  design/banner.jpeg        the wide lockup, used for the social card
+  design/logo-master.png    the original ink drawing, still the source of the
+                            standalone hand on the home page
+
+The mark carries its own cream disc, so it sits on any background and needs no
+inverted variant. The hand is cut from the ink drawing and tinted navy so it
+matches the rest of the identity.
+
+If the artwork is redrawn, replace the masters and run this again. Filenames
+and pixel sizes stay the same, so nothing else has to change.
 """
 
 import os
+
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-MASTER = os.path.join(HERE, "logo-master.png")
 OUT_IMG = os.path.join(ROOT, "assets", "images")
 OUT_ICO = os.path.join(ROOT, "assets", "favicon")
 
-INK = 13          # matches --color-ink (#0d0d0d) in css/variables.css
-BG = (242, 242, 242)   # matches --color-bg (#f2f2f2)
-
-# Crop boxes in master pixels: (left, top, right, bottom). Generous — each piece
-# is trimmed to its own ink afterwards.
-REGIONS = {
-    "mark":     (0,    1100, 2320, 1430),   # the three ellipses
-    "wordmark": (2950, 1080, 6000, 1510),   # "Dev Community"
-    "chevron":  (30,   2780, 2200, 4680),   # the drawn chevron
-    "hand":     (3600, 1600, 6000, 4688),   # the reaching hand, without the ground bar
-    "full":     (0,    1080, 6000, 5210),   # the whole lockup
-}
-
-# Fonts for the Open Graph card. These are the closest faces available locally
-# to the two the site loads from Google Fonts: Garamond stands in for
-# EB Garamond, Courier New for Courier Prime.
-SERIF = r"C:\Windows\Fonts\GARABD.TTF"
-MONO = r"C:\Windows\Fonts\cour.ttf"
+# Sampled from the artwork, not chosen by eye. These are the same values as the
+# brand tokens in css/variables.css.
+NAVY = (6, 35, 80)
+PAPER = (247, 243, 234)
 
 
-def load_alpha():
-    """Master as an alpha channel: white becomes transparent, ink opaque."""
-    grey = Image.open(MASTER).convert("L")
-    return Image.fromarray((255 - np.asarray(grey).astype(np.int16)).clip(0, 255).astype(np.uint8))
+def trim(image, tolerance=246):
+    """Drop the near-white surround a JPEG export leaves behind."""
+    a = np.asarray(image.convert("RGB"))
+    mask = (a.max(2) < tolerance) | (a.min(2) < tolerance - 11)
+    ys, xs = np.where(mask)
+    if not len(xs):
+        return image
+    return image.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
 
 
-def piece(alpha, box):
-    part = alpha.crop(box)
+def cut_out_surround(image, tolerance=40):
+    """Make everything outside the disc transparent.
+
+    The JPEG has a white surround and the disc has a cream interior, so a
+    simple "white becomes transparent" rule would punch a hole through the
+    middle of the mark. Flooding inwards from the corners only clears what is
+    actually outside, because the navy ring encloses the interior.
+    """
+    rgb = image.convert("RGB")
+    marker = (255, 0, 255)
+    probe = rgb.copy()
+    draw = ImageDraw.floodfill
+    for corner in ((0, 0), (probe.width - 1, 0), (0, probe.height - 1),
+                   (probe.width - 1, probe.height - 1)):
+        draw(probe, corner, marker, thresh=tolerance)
+    outside = (np.asarray(probe) == np.array(marker)).all(axis=2)
+    alpha = np.where(outside, 0, 255).astype(np.uint8)
+    out = rgb.convert("RGBA")
+    out.putalpha(Image.fromarray(alpha))
+    return out
+
+
+def save(image, path, width=None, height=None, background=PAPER, colours=96):
+    """Write a PNG and a WebP.
+
+    The artwork is flat colour on a cream ground but arrives as a JPEG, so it
+    carries compression noise that makes a straight PNG enormous. Quantising to
+    a small palette removes the noise rather than storing it, and takes the
+    files from hundreds of kilobytes to tens.
+    """
+    if width:
+        height = max(1, round(image.height * width / image.width))
+    elif height:
+        width = max(1, round(image.width * height / image.height))
+    out = image.resize((width, height), Image.LANCZOS)
+    flat = Image.new("RGB", out.size, background)
+    flat.paste(out, (0, 0), out if out.mode == "RGBA" else None)
+    quantised = flat.quantize(colors=colours, method=Image.MEDIANCUT,
+                              dither=Image.NONE)
+    quantised.save(path, optimize=True)
+    flat.save(os.path.splitext(path)[0] + ".webp", quality=86, method=6)
+
+
+def hand_from_ink(master_path):
+    """Cut the hand out of the original drawing and tint it navy.
+
+    White becomes transparent so it sits on the cream page the way the ink
+    version did, but in the identity's own colour rather than black.
+    """
+    grey = Image.open(master_path).convert("L")
+    alpha = Image.fromarray((255 - np.asarray(grey).astype(np.int16)).clip(0, 255).astype(np.uint8))
+    part = alpha.crop((3600, 1600, 6000, 4688))
     bounds = part.point(lambda v: 255 if v > 18 else 0).getbbox()
-    return part.crop(bounds) if bounds else part
+    if bounds:
+        part = part.crop(bounds)
+    return part
 
 
-def write(part, path, target, axis="w", tone=INK):
-    width, height = part.size
-    if axis == "w":
-        size = (target, max(1, round(height * target / width)))
-    else:
-        size = (max(1, round(width * target / height)), target)
-    part = part.resize(size, Image.LANCZOS)
-    image = Image.merge("LA", (Image.new("L", part.size, tone), part))
+def write_rgba(alpha, path, height, tone):
+    width = max(1, round(alpha.width * height / alpha.height))
+    a = alpha.resize((width, height), Image.LANCZOS)
+    image = Image.merge("RGBA", tuple(Image.new("L", a.size, c) for c in tone) + (a,))
     image.save(path, optimize=True)
     image.convert("RGBA").save(os.path.splitext(path)[0] + ".webp", quality=88, method=6)
 
 
-def favicon(chevron, size, pad, background=None, boost=1.0):
+def favicon(mark, size, pad=0.0):
     inner = round(size * (1 - 2 * pad))
-    width, height = chevron.size
-    scale = inner / max(width, height)
-    part = chevron.resize((max(1, round(width * scale)), max(1, round(height * scale))), Image.LANCZOS)
-    # Small sizes need the thin strokes darkened or they disappear.
-    part = Image.fromarray((np.power(np.asarray(part).astype(np.float32) / 255.0, boost) * 255).astype(np.uint8))
-    canvas = Image.new("RGBA", (size, size), background or (0, 0, 0, 0))
-    ink = Image.merge("RGBA", (Image.new("L", part.size, INK),) * 3 + (part,))
-    canvas.alpha_composite(ink, ((size - part.size[0]) // 2, (size - part.size[1]) // 2))
+    scaled = mark.resize((inner, inner), Image.LANCZOS)
+    canvas = Image.new("RGB", (size, size), PAPER)
+    canvas.paste(scaled, ((size - inner) // 2, (size - inner) // 2),
+                 scaled if scaled.mode == "RGBA" else None)
     return canvas
 
 
-def draw_tracked(draw, xy, text, font, fill, tracking):
-    """Draw text with letter-spacing, and return the width it occupied."""
-    x, y = xy
-    for char in text:
-        draw.text((x, y), char, font=font, fill=fill)
-        x += draw.textlength(char, font=font) + tracking
-    return int(x - tracking - xy[0])
-
-
 def main():
-    alpha = load_alpha()
-    parts = {name: piece(alpha, box) for name, box in REGIONS.items()}
-    for name, part in parts.items():
-        print(f"  {name:9s} {part.size}")
+    mark = trim(Image.open(os.path.join(HERE, "logo-colour.jpeg")))
+    banner = trim(Image.open(os.path.join(HERE, "banner.jpeg")))
+    print(f"  mark   {mark.size}")
+    print(f"  banner {banner.size}")
 
-    write(parts["mark"], os.path.join(OUT_IMG, "logo-mark.png"), 320)
-    write(parts["wordmark"], os.path.join(OUT_IMG, "wordmark.png"), 1100)
-    write(parts["chevron"], os.path.join(OUT_IMG, "chevron.png"), 560)
-    write(parts["hand"], os.path.join(OUT_IMG, "hand.png"), 1200, axis="h")
-    write(parts["full"], os.path.join(OUT_IMG, "logo-full.png"), 1600)
+    # The mark: the surround is cut away so the disc sits on any ground.
+    mark = cut_out_surround(mark)
+    for name, width in (("logo-mark.png", 320), ("logo-mark-large.png", 720)):
+        scaled = mark.resize((width, max(1, round(mark.height * width / mark.width))),
+                             Image.LANCZOS)
+        # FASTOCTREE rather than MEDIANCUT: it is the only method Pillow will
+        # quantise an RGBA image with, and the alpha is the whole point here.
+        scaled.quantize(colors=96, method=Image.FASTOCTREE).save(
+            os.path.join(OUT_IMG, name), optimize=True)
+        scaled.save(os.path.join(OUT_IMG, os.path.splitext(name)[0] + ".webp"),
+                    quality=86, method=6)
 
-    # White versions for the ink footer and bands.
-    write(parts["mark"], os.path.join(OUT_IMG, "logo-mark-inverse.png"), 320, tone=255)
-    write(parts["wordmark"], os.path.join(OUT_IMG, "wordmark-inverse.png"), 1100, tone=255)
-    write(parts["chevron"], os.path.join(OUT_IMG, "chevron-inverse.png"), 560, tone=255)
+    # The wide lockup, for anywhere the full name is wanted as artwork.
+    save(banner, os.path.join(OUT_IMG, "banner.png"), width=1600)
 
-    chevron = parts["chevron"]
-    favicon(chevron, 16, 0.03, boost=0.42).save(os.path.join(OUT_ICO, "favicon-16.png"), optimize=True)
-    favicon(chevron, 32, 0.04, boost=0.48).save(os.path.join(OUT_ICO, "favicon-32.png"), optimize=True)
-    favicon(chevron, 48, 0.04, boost=0.52).save(os.path.join(OUT_ICO, "favicon-48.png"), optimize=True)
-    favicon(chevron, 180, 0.16, background=BG + (255,)).save(os.path.join(OUT_ICO, "apple-touch-icon.png"), optimize=True)
-    favicon(chevron, 192, 0.14, background=BG + (255,)).save(os.path.join(OUT_ICO, "icon-192.png"), optimize=True)
-    favicon(chevron, 512, 0.16, background=BG + (255,)).save(os.path.join(OUT_ICO, "icon-512.png"), optimize=True)
+    # The hand keeps its place on the home page, now in navy rather than black.
+    ink = os.path.join(HERE, "logo-master.png")
+    if os.path.exists(ink):
+        write_rgba(hand_from_ink(ink), os.path.join(OUT_IMG, "hand.png"), 1200, NAVY)
+
+    # Favicons come from the mark, which is legible small because the disc
+    # gives it a solid silhouette.
+    for size in (16, 32, 48, 180, 192, 512):
+        name = {180: "apple-touch-icon.png", 192: "icon-192.png",
+                512: "icon-512.png"}.get(size, f"favicon-{size}.png")
+        icon = favicon(mark, size).quantize(colors=96, method=Image.MEDIANCUT)
+        icon.save(os.path.join(OUT_ICO, name), optimize=True)
     Image.open(os.path.join(OUT_ICO, "favicon-48.png")).save(
         os.path.join(OUT_ICO, "favicon.ico"), sizes=[(16, 16), (32, 32), (48, 48)])
 
-    # Open Graph card: the hero composition at 1200x630.
-    card = Image.new("RGB", (1200, 630), BG)
-    draw = ImageDraw.Draw(card)
-    bar = (INK, INK, INK)
-    draw.rectangle([0, 556, 1200, 630], fill=bar)
-    draw.rectangle([0, 548, 1200, 552], fill=bar)
-
-    hand = parts["hand"]
-    scale = 470 / hand.size[1]
-    hand = hand.resize((round(hand.size[0] * scale), 470), Image.LANCZOS)
-    card.paste(Image.new("RGB", hand.size, bar), (838, 92), hand)
-
-    mark = parts["mark"]
-    mark = mark.resize((210, max(1, round(mark.size[1] * 210 / mark.size[0]))), Image.LANCZOS)
-    card.paste(Image.new("RGB", mark.size, bar), (76, 84), mark)
-
-    draw.text((72, 156), "KDU Developer", font=ImageFont.truetype(SERIF, 104), fill=bar)
-    draw.text((72, 268), "Community", font=ImageFont.truetype(SERIF, 104), fill=bar)
-
-    # The caption is letter-spaced by hand: PIL has no tracking, and it has to
-    # stay clear of the hand on the right, so its width is measured and checked.
-    caption = "KYUNGDONG UNIVERSITY · SOUTH KOREA"
-    width = draw_tracked(draw, (74, 414), caption, ImageFont.truetype(MONO, 21), (90, 90, 90), 3)
-    assert 74 + width < 800, f"OG caption is {width}px wide and would run under the hand"
-
-    # Rule sits below the descenders of "Community", not through them.
-    draw.line([72, 396, 74 + width, 396], fill=(170, 170, 170), width=2)
-    card.save(os.path.join(OUT_IMG, "og-image.png"), optimize=True)
+    # Social card: the banner centred on the cream ground at 1200x630.
+    card = Image.new("RGB", (1200, 630), PAPER)
+    scaled = banner.resize((1120, max(1, round(banner.height * 1120 / banner.width))), Image.LANCZOS)
+    card.paste(scaled.convert("RGB"), (40, (630 - scaled.height) // 2))
+    card.quantize(colors=128, method=Image.MEDIANCUT, dither=Image.NONE).save(
+        os.path.join(OUT_IMG, "og-image.png"), optimize=True)
 
     print("done")
 
