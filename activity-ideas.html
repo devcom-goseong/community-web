@@ -166,10 +166,16 @@
         </p>
 
         <!-- Two groups: how to reach the community, and where to follow it.
-             Once an address exists, replace the <span> with
-             <a href="URL" rel="noopener">Discord</a> and delete its "Soon" tag.
-             On the Django build these rows come from the admin instead, so
-             adding a platform there needs no edit to any page. -->
+
+             Do NOT put the Discord or WhatsApp invite links in this file. This
+             is a static page: anything written here is public to everyone,
+             spammers included. Invite links belong in the Django admin
+             (Social links), which only shows them to approved members who are
+             signed in.
+
+             The "Follow us" pages are public, so those are fine here: once an
+             address exists, replace the <span> with
+             <a href="URL" rel="me noopener">LinkedIn</a> and delete its "Soon" tag. -->
         <p class="footer__heading mt-7">Where we talk</p>
         <ul class="footer__list">
           <li><span>Discord</span> <span class="footer__soon">Soon</span></li>
